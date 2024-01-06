@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Policy;
 using System.Windows;
+using SteamCMD_Tools.steam;
 
 namespace SteamCMD_Tools
 {
@@ -46,7 +47,6 @@ namespace SteamCMD_Tools
 
 
                 client.DownloadFileAsync(url, CMD_ZIP_FILE);
-                Trace.WriteLine("Jyy");
             }
             catch (WebException ex)
             {
@@ -56,26 +56,26 @@ namespace SteamCMD_Tools
 
         private void Client_DownloadFileCompleted(object? sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
-            Trace.WriteLine("Download completed!");
             InstallSteamCMD();
         }
 
         private void ClientOnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            if(e.ProgressPercentage <= 80) { }
+            if(e.ProgressPercentage <= 70) { }
               window.Download_ProgressBar.Value = e.ProgressPercentage;
-
-            Trace.WriteLine($"{(string)e.UserState}    " +
-                $"downloaded {e.BytesReceived} of {e.TotalBytesToReceive}" +
-                $" bytes. {e.ProgressPercentage} % complete...");
         }
 
-        public void InstallSteamCMD()
+        public async void InstallSteamCMD()
         {
-            if (!Directory.Exists(CMD_DIR) || Directory.GetFiles(CMD_DIR).Length == 0)
+            window.GetSettings().CheckIfInstalled();
+
+            if (window.GetSettings().IsInstalled())
             {
-                Directory.Delete(CMD_DIR);
+                MessageBox.Show("Already installed!", "SteamCMD Tools",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
             }
+                
 
             Directory.CreateDirectory(CMD_DIR);
             ZipFile.ExtractToDirectory(CMD_ZIP_FILE, CMD_DIR, true);
@@ -86,27 +86,34 @@ namespace SteamCMD_Tools
                 process.StartInfo.FileName = $"{CMD_DIR}/{CMD_FILENAME}";
                 process.StartInfo.Arguments = "+quit";
                 process.StartInfo.UseShellExecute = false;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.CreateNoWindow = true;
+                //process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.CreateNoWindow = false;
                 //process.OutputDataReceived += Process_OutputDataReceived;
 
                 process.Start();
 
-                process.WaitForExitAsync();
+
+                Task task = process.WaitForExitAsync();
+                task.Wait();
+
+                process.CloseMainWindow();
                 process.Close();
+
                 window.Download_ProgressBar.Value = 100;
 
                 MessageBox.Show("Installation completed!", "SteamCMD Tools",
-                    MessageBoxButton.OK ,MessageBoxImage.Information);
+                    MessageBoxButton.OK, MessageBoxImage.Information);
 
                 isInstalling = false;
+                window.GetSettings().CheckIfInstalled();
+
             }
 
         }
 
         private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            Debug.WriteLine(e.Data);
+           // Debug.WriteLine(e.Data);
         }
     }
 }

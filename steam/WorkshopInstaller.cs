@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using SteamCMD_Tools.steam;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Windows;
+using System.Threading.Tasks;
 
 namespace SteamCMD_Tools
 {
@@ -19,32 +22,49 @@ namespace SteamCMD_Tools
                 {"Hearts of Iron IV", 394360 },
                 {"Project Zomboid", 108600 },
                 {"Garry's Mod", 4000},
-                {"Crusader Kings III", 1158310 }
+                {"Crusader Kings III", 1158310 },
+                {"CS:GO", 624820 }
             };
 
         
         private ulong AppId = 0;
         private List<string> workshopContentIds;
-        private bool consoleEnabled;
-        private bool quitEnabled;
+        // private bool consoleEnabled;
+        // private bool quitEnabled;
 
         public WorkshopInstaller(MainWindow window) 
         {
             this.window = window;
             this.workshopContentIds = new List<string>();
-            this.consoleEnabled = true;
-            this.quitEnabled = false;
+            //this.consoleEnabled = true;
+            //this.quitEnabled = true;
         }
 
-        public void DownloadWorkshopItems()
+        public async void DownloadWorkshopItems()
         {
+            window.GetSettings().CheckIfInstalled();
+
+            if (!window.GetSettings().IsInstalled())
+            {
+                MessageBox.Show("SteamCMD not installed.", "SteamCMD Tools",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if(workshopContentIds.Count == 0)
+            {
+                MessageBox.Show("There are no addons to download.", "SteamCMD Tools",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             using (Process process = new Process())
             {
                 string args = "+login anonymous ";
                 foreach (string item in workshopContentIds)
                     args += $"+workshop_download_item {AppId} {item} ";
 
-                if(quitEnabled)
+                if(window.GetSettings().IsQuitEnabled())
                   args += "+quit";
 
                 process.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
@@ -52,7 +72,7 @@ namespace SteamCMD_Tools
                 process.StartInfo.Arguments = args;
                 process.StartInfo.UseShellExecute = false;
 
-                process.StartInfo.CreateNoWindow = !consoleEnabled;
+                process.StartInfo.CreateNoWindow = !window.GetSettings().IsConsoleEnabled();
 
                 //if (consoleEnabled)
                    // process.StartInfo.RedirectStandardOutput = true;
@@ -69,14 +89,17 @@ namespace SteamCMD_Tools
                 }
                 */
 
-                process.WaitForExitAsync();
+                Task task = process.WaitForExitAsync();
+
+                task.Wait();
+                process.CloseMainWindow();
                 process.Close();
             }
 
             using (Process explorer = new Process())
             {
                 explorer.StartInfo.Arguments = Directory.GetCurrentDirectory()
-                    + "\\" + CMD_DIR + "\\steamapps\\workshop\\content\\" + AppId;
+                    + "\\" + CMD_DIR + "\\steamapps\\workshop\\content\\"; //+ AppId;
 
                 explorer.StartInfo.FileName = "explorer.exe";
 
@@ -100,14 +123,5 @@ namespace SteamCMD_Tools
             workshopContentIds = items;
         }
 
-        public void SetConsoleEnabled(bool enabled)
-        {
-            this.consoleEnabled = enabled;
-        }
-
-        public void SetQuitEnabled(bool enabled)
-        {
-            this.quitEnabled = enabled;
-        }
     }
 }

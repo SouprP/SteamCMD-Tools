@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SteamCMD_Tools"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="600">
+        ResizeMode="NoResize"
+        Title="SteamCMD Tools" Height="450" Width="600">
     <Grid Width="600" Height="450" VerticalAlignment="Center" HorizontalAlignment="Center" Background="#FF4C4B4B">
         <Button x:Name="Install_SteamCMD" Content="Install SteamCMD&#xD;&#xA;" RenderTransformOrigin="0.5,0.5" Click="Install_SteamCMD_Button_Click" Width="150" Height="25" Background="#FF4E4E4E" FontSize="16" Margin="0,10,25,50" HorizontalAlignment="Right" VerticalAlignment="Bottom" BorderBrush="Black"/>
         <ProgressBar x:Name="Download_ProgressBar" HorizontalAlignment="Right" Height="25" VerticalAlignment="Bottom" Width="80" ValueChanged="Download_ProgressBar_ValueChanged" RenderTransformOrigin="0.5,0.5" FontSize="16" FontWeight="Bold" Margin="0,0,95,85" BorderBrush="Black"/>
@@ -18,10 +19,11 @@
             </ComboBox.Background>
             <ComboBoxItem Content="Rimworld"/>
             <ComboBoxItem Cursor="" Content="Cities Skylines"/>
-            <ComboBoxItem Content="Hearts of Iron IV"/>
+            <ComboBoxItem Content="Hearts of Iron IV" IsEnabled="False"/>
             <ComboBoxItem Content="Project Zomboid"/>
             <ComboBoxItem Content="Garry's Mod"/>
-            <ComboBoxItem Content="Crusader Kings III"/>
+            <ComboBoxItem Content="Crusader Kings III" IsEnabled="False"/>
+            <ComboBoxItem Content="CS:GO"/>
         </ComboBox>
 
         <TextBox x:Name="AppId_Text_Input" HorizontalAlignment="Right" TextWrapping="Wrap" Text="APP ID" VerticalAlignment="Top" Width="150" TextChanged="AppId_Text_Input_TextChanged" FontSize="14" InputScope="Digits" TextAlignment="Center" RenderTransformOrigin="0.353,0.202" Height="25" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Margin="0,75,25,0" Background="#FF4E4E4E" BorderBrush="Black"/>

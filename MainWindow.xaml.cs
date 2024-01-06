@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SteamCMD_Tools.steam;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -14,17 +15,19 @@ namespace SteamCMD_Tools
         SteamInstaller installer;
         WorkshopInstaller workshopInstaller;
 
+        Settings settings;
+
         Regex rgx = new Regex("[0-9]+");
 
         public MainWindow()
         {
-            //MainWindow.
+            settings = new Settings();
             installer = new SteamInstaller(this);
             workshopInstaller = new WorkshopInstaller(this);
 
+
+            settings.CheckIfInstalled();
             InitializeComponent();
-            //string[] arr = { "1372003680", "3071298014" };
-            //workshopInstaller.DownloadOther(arr);
         }
 
         private void Install_SteamCMD_Button_Click(object sender, RoutedEventArgs e)
@@ -76,15 +79,16 @@ namespace SteamCMD_Tools
         // ON CLICK
         private void Console_CheckBox_Clicked(object sender, RoutedEventArgs e)
         {
-            // THIS DOESNT WORK, FIX IT
+            // This looks terrible, should be redone
             bool value = (bool)Console_CheckBox.IsChecked;
-            Debug.WriteLine(value);
             if (value)
             {
-                workshopInstaller.SetConsoleEnabled(value);
+                //workshopInstaller.SetConsoleEnabled(value);
+                settings.SetConsoleEnabled(true);
                 return;
             }
-            workshopInstaller.SetConsoleEnabled(false);
+            //workshopInstaller.SetConsoleEnabled(false);
+            settings.SetConsoleEnabled(false);
         }
 
         private void Console_TextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -101,14 +105,20 @@ namespace SteamCMD_Tools
         {
             
             bool value = (bool) Quit_CheckBox.IsChecked;
-            Debug.WriteLine(value);
             if(value)
             {
-                workshopInstaller.SetQuitEnabled(value);
+                //workshopInstaller.SetQuitEnabled(value);
+                settings.SetQuitEnabled(true);
                 return;
             }
-            workshopInstaller.SetQuitEnabled(false);
+            //workshopInstaller.SetQuitEnabled(false);
+            settings.SetQuitEnabled(false);
             
+        }
+
+        public Settings GetSettings()
+        {
+            return settings;
         }
 
     }
